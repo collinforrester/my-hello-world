@@ -16,6 +16,16 @@ function logout() {
     window.location.href = '/login';
 }
 
+function checkIfUserIsLoggedIn() {
+    var authToken = localStorage.getItem('AuthToken');
+    if(!authToken) {
+        console.log('It appears the user is not logged in. redirecting to /login');
+        window.location.href = '/login';
+    } else {
+        console.log('They seem to be logged in, leaving them alone.')
+    }
+}
+
 /////////////////////////////
 // parent  section.        //
 /////////////////////////////
@@ -83,6 +93,7 @@ function onAdminUserListPageLoad() {
 
 window.avant = {
     logout: logout,
+    checkIfUserIsLoggedIn: checkIfUserIsLoggedIn,
     fillHtml: fillHtml,
     onAddChildPageLoad: onAddChildPageLoad,
     onAddUserPageLoad: onAddUserPageLoad,
