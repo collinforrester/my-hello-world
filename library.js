@@ -17,10 +17,31 @@ function logout() {
 }
 
 function checkIfUserIsLoggedIn() {
+    /** old way 
+     * function isLoggedIn() {
+    var hasToken = xano.hasAuthToken();
+    var loggedIn = true;
+   	if(!hasToken) loggedIn = false;
+    return xano.get('/auth/me').then(function(){
+    	return loggedIn;
+    },function(error){
+    	console.log('Potential authToken issues. Add the code to redirect the user to the login page.');
+      	console.log('Error');
+      	loggedIn = false;
+      return loggedIn;
+    });
+  }
+  
+  isLoggedIn().then(function(isLoggedIn){
+  	console.log('I have determined that the user is ' + (isLoggedIn ? '' : 'not') + ' logged in.');
+  });
+     */
     var authToken = localStorage.getItem('AuthToken');
     if(!authToken) {
         console.log('It appears the user is not logged in. redirecting to /login');
-        window.location.href = '/login';
+        if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
     } else {
         console.log('They seem to be logged in, leaving them alone.')
     }
