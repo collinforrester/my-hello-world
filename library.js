@@ -2,49 +2,76 @@
 // general helpers.        //
 /////////////////////////////
 
-function fillHtml(clonedElement, parentElement, json) {
-    for (const [key, value] of Object.entries(json)) {
-        clonedElement.querySelector(`[avant-id="${key}"]`).value = value;
-    }
+function fillListWithItems(elementToClone, parentElement, jsonArray, skipArr) {
+  for (const [key, value] of Object.entries(json)) {
+    clonedElement.querySelector(`[avant-id="${key}"]`).value = value;
+  }
 
-    // Append the cloned element to the DOM.
-    document.body.appendChild(clonedElement);
+  // Append the cloned element to the DOM.
+  document.body.appendChild(clonedElement);
 }
 
+function fillHtmlItem(element, skipArr) {
+  for (const [key, value] of Object.entries(json)) {
+    element.querySelector(`[avant-id="${key}"]`).value = value;
+  }
+  return element;
+}
+
+function cloneAndFill(elementToClone, parentElement, jsonItems, jsonAttributesToSkip) {
+  // Iterate over the json items
+  for (const jsonItem of jsonItems) {
+    // Clone the element
+    const clone = elementToClone.cloneNode(true);
+
+    // Iterate over the json item properties
+    for (const [key, value] in jsonItem) {
+      // Check if the key is in the skip list
+      if (jsonAttributesToSkip.includes(key)) {
+        continue;
+      }
+
+      // Get the HTML element with the avant-id attribute set to the key
+      // const htmlElement = clone.querySelector(`[avant-id="${key}"]`);
+      clone.querySelector(`[avant-id="${key}"]`).value = value;
+
+      // Set the value of the HTML element to the value of the json item property
+      // if (htmlElement) {
+      //   htmlElement.textContent = jsonItem[key];
+      // }
+    }
+
+    // Append the clone to the parent element
+    parentElement.appendChild(clone);
+  }
+}
+
+
 function logout() {
-    localStorage.removeItem('AuthToken');
-    window.location.href = '/login';
+  console.log('clearing old logins.');
+  localStorage.removeItem('AuthToken');
+  // window.location.href = '/login';
 }
 
 function checkIfUserIsLoggedIn() {
-    /** old way 
-     * function isLoggedIn() {
-    var hasToken = xano.hasAuthToken();
-    var loggedIn = true;
-   	if(!hasToken) loggedIn = false;
-    return xano.get('/auth/me').then(function(){
-    	return loggedIn;
-    },function(error){
-    	console.log('Potential authToken issues. Add the code to redirect the user to the login page.');
-      	console.log('Error');
-      	loggedIn = false;
-      return loggedIn;
-    });
-  }
-  
-  isLoggedIn().then(function(isLoggedIn){
-  	console.log('I have determined that the user is ' + (isLoggedIn ? '' : 'not') + ' logged in.');
-  });
-     */
-    var authToken = localStorage.getItem('AuthToken');
-    if(!authToken) {
-        console.log('It appears the user is not logged in. redirecting to /login');
-        if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-        }
+  var hasToken = xano.hasAuthToken();
+  var loggedIn = true;
+  if (!hasToken) loggedIn = false;
+  xano.get('/auth/me').then(function () {
+    return loggedIn;
+  }, function (error) {
+    loggedIn = false;
+    return loggedIn;
+  }).then(function(loggedIn) {
+    if(loggedIn) {
+      console.log('It appears the user is logged in... leaving them alone.');
     } else {
-        console.log('They seem to be logged in, leaving them alone.')
+      if (window.location.pathname !== '/login') {
+        console.log('It appears the user is not logged in. redirecting to /login');
+        window.location.href = '/login';
+      }
     }
+  });
 }
 
 /////////////////////////////
@@ -52,15 +79,15 @@ function checkIfUserIsLoggedIn() {
 /////////////////////////////
 
 function onAddChildPageLoad() {
-    document.querySelector('#add-child').addEventListener('click',function(e){
-        e.preventDefault();
-        var access_code = document.getElementById('student-access-code').value;
-        xano.post('/students/add_to_family',{
-            "access_code": access_code
-        }).then(function(response){
-            window.location.href = '/student/my-children';
-        });
+  document.querySelector('#add-child').addEventListener('click', function (e) {
+    e.preventDefault();
+    var access_code = document.getElementById('student-access-code').value;
+    xano.post('/students/add_to_family', {
+      "access_code": access_code
+    }).then(function (response) {
+      window.location.href = '/student/my-children';
     });
+  });
 }
 
 /////////////////////////////
@@ -68,40 +95,40 @@ function onAddChildPageLoad() {
 /////////////////////////////
 
 function onAddUserPageLoad() {
-    // write my some javascript code that detects a click on #create-user, gets the values from #first-name, #last-name, #employee-id, #email, #role dropdown, and #send-email checkbox and post the values using the xano sdk
-    const createUserButton = document.getElementById("create-user");
-    var redirectTo = '/avant/admin/users';
+  // write my some javascript code that detects a click on #create-user, gets the values from #first-name, #last-name, #employee-id, #email, #role dropdown, and #send-email checkbox and post the values using the xano sdk
+  const createUserButton = document.getElementById("create-user");
+  var redirectTo = '/avant/admin/users';
 
-    createUserButton.addEventListener("click", (event) => {
-        // Get the values from the form fields.
-        // these IDs need udpated to match how they're actually selected.
-        const firstName = document.getElementById("first-name").value;
-        const lastName = document.getElementById("last-name").value;
-        const employeeId = document.getElementById("employee-id").value;
-        const email = document.getElementById("email").value;
-        const role = document.getElementById("role").value;
-        const sendEmail = document.getElementById("send-email").checked;
+  createUserButton.addEventListener("click", (event) => {
+    // Get the values from the form fields.
+    // these IDs need udpated to match how they're actually selected.
+    const firstName = document.getElementById("first-name").value;
+    const lastName = document.getElementById("last-name").value;
+    const employeeId = document.getElementById("employee-id").value;
+    const email = document.getElementById("email").value;
+    const role = document.getElementById("role").value;
+    const sendEmail = document.getElementById("send-email").checked;
 
-        // Create a new Xano user object.
-        const user = {
-            firstName,
-            lastName,
-            employeeId,
-            email,
-            role,
-            sendEmail,
-        };
+    // Create a new Xano user object.
+    const user = {
+      firstName,
+      lastName,
+      employeeId,
+      email,
+      role,
+      sendEmail,
+    };
 
-        // Post the user object to Xano.
-        xano.post("/users", user, (err, user) => {
-            if (err) {
-                console.error('There was an error creating the user', err);
-            } else {
-                console.log("User created successfully!");
-                window.location.href = redirectTo;
-            }
-        });
+    // Post the user object to Xano.
+    xano.post("/users", user, (err, user) => {
+      if (err) {
+        console.error('There was an error creating the user', err);
+      } else {
+        console.log("User created successfully!");
+        window.location.href = redirectTo;
+      }
     });
+  });
 }
 
 function onAdminUserListPageLoad() {
@@ -113,10 +140,10 @@ function onAdminUserListPageLoad() {
 /////////////////////////////
 
 window.avant = {
-    logout: logout,
-    checkIfUserIsLoggedIn: checkIfUserIsLoggedIn,
-    fillHtml: fillHtml,
-    onAddChildPageLoad: onAddChildPageLoad,
-    onAddUserPageLoad: onAddUserPageLoad,
-    onAdminUserListPageLoad: onAdminUserListPageLoad
+  logout: logout,
+  checkIfUserIsLoggedIn: checkIfUserIsLoggedIn,
+  fillHtml: fillHtml,
+  onAddChildPageLoad: onAddChildPageLoad,
+  onAddUserPageLoad: onAddUserPageLoad,
+  onAdminUserListPageLoad: onAdminUserListPageLoad
 };
