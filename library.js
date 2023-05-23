@@ -143,6 +143,7 @@ window.avant = {
   logout: logout,
   checkIfUserIsLoggedIn: checkIfUserIsLoggedIn,
   fillHtml: fillHtml,
+  cloneAndFill: cloneAndFill,
   onAddChildPageLoad: onAddChildPageLoad,
   onAddUserPageLoad: onAddUserPageLoad,
   onAdminUserListPageLoad: onAdminUserListPageLoad
