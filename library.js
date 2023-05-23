@@ -25,21 +25,20 @@ function cloneAndFill(elementToClone, parentElement, jsonItems, jsonAttributesTo
     const clone = elementToClone.cloneNode(true);
 
     // Iterate over the json item properties
-    for (const [key, value] in jsonItem) {
+    Object.entries(jsonItem).forEach(function([key, value]){
       // Check if the key is in the skip list
-      if (jsonAttributesToSkip.includes(key)) {
+      if (jsonAttributesToSkip.indexOf(key) > -1) {
         continue;
       }
 
       // Get the HTML element with the avant-id attribute set to the key
       // const htmlElement = clone.querySelector(`[avant-id="${key}"]`);
-      clone.querySelector(`[avant-id="${key}"]`).value = value;
-
-      // Set the value of the HTML element to the value of the json item property
-      // if (htmlElement) {
-      //   htmlElement.textContent = jsonItem[key];
-      // }
-    }
+      try {
+        clone.querySelector(`[avant-id="${key}"]`).value = value;
+      } catch(e) {
+        console.log(`Unable to find the selector [avant-id="${key}"], skipping for now.`);
+      }
+    })
 
     // Append the clone to the parent element
     parentElement.appendChild(clone);
