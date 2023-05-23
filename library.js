@@ -27,16 +27,14 @@ function cloneAndFill(elementToClone, parentElement, jsonItems, jsonAttributesTo
     // Iterate over the json item properties
     Object.entries(jsonItem).forEach(function([key, value]){
       // Check if the key is in the skip list
-      if (jsonAttributesToSkip.indexOf(key) > -1) {
-        continue;
-      }
-
-      // Get the HTML element with the avant-id attribute set to the key
-      // const htmlElement = clone.querySelector(`[avant-id="${key}"]`);
-      try {
-        clone.querySelector(`[avant-id="${key}"]`).value = value;
-      } catch(e) {
-        console.log(`Unable to find the selector [avant-id="${key}"], skipping for now.`);
+      if (jsonAttributesToSkip.indexOf(key) == -1) {
+        // Get the HTML element with the avant-id attribute set to the key
+        // const htmlElement = clone.querySelector(`[avant-id="${key}"]`);
+        try {
+          clone.querySelector(`[avant-id="${key}"]`).innerHTML = value;
+        } catch(e) {
+          console.log(`Unable to find the selector [avant-id="${key}"], skipping for now.`);
+        };
       }
     })
 
