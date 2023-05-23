@@ -25,14 +25,14 @@ function cloneAndFill(elementToClone, parentElement, jsonItems, jsonAttributesTo
     const clone = elementToClone.cloneNode(true);
 
     // Iterate over the json item properties
-    Object.entries(jsonItem).forEach(function([key, value]){
+    Object.entries(jsonItem).forEach(function ([key, value]) {
       // Check if the key is in the skip list
       if (jsonAttributesToSkip.indexOf(key) == -1) {
         // Get the HTML element with the avant-id attribute set to the key
         // const htmlElement = clone.querySelector(`[avant-id="${key}"]`);
         try {
           clone.querySelector(`[avant-id="${key}"]`).innerHTML = value;
-        } catch(e) {
+        } catch (e) {
           console.log(`Unable to find the selector [avant-id="${key}"], skipping for now.`);
         };
       }
@@ -59,8 +59,8 @@ function checkIfUserIsLoggedIn() {
   }, function (error) {
     loggedIn = false;
     return loggedIn;
-  }).then(function(loggedIn) {
-    if(loggedIn) {
+  }).then(function (loggedIn) {
+    if (loggedIn) {
       console.log('It appears the user is logged in... leaving them alone.');
     } else {
       if (window.location.pathname !== '/login') {
@@ -90,6 +90,64 @@ function onAddChildPageLoad() {
 /////////////////////////////
 // super admin section.    //
 /////////////////////////////
+function onAddSuperAdminPageLoad() {
+  xano.get('/jarvis_schools')
+    .then(data => {
+      // Find the dropdown element
+      let dropdown = document.getElementById('school_names');
+      if (!dropdown) {
+        console.error('Dropdown element not found');
+        return;
+      }
+
+      // Clear the dropdown
+      dropdown.innerHTML = '';
+
+      // Populate the dropdown
+      data.body.forEach(item => {
+        // Create new option element
+        let option = document.createElement('option');
+
+        // Set option value and text
+        option.value = item.id;
+        option.text = item.school_name;
+
+        // Add the option to the dropdown
+        dropdown.add(option);
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+  // Form submission code
+  var submitButton = document.getElementById('submit_button');
+
+  submitButton.addEventListener('click', function (e) {
+    e.preventDefault();// prevents the default submit event
+
+    var first_name = document.getElementById('first_name').value;
+    var last_name = document.getElementById('last_name').value;
+    var email = document.getElementById('email_address').value;
+    var schools = document.getElementById('school_names').value;
+    var default_password = 'AvantHealth1';
+    // these have to match the xano endpoint table columns 
+    xano.post('/jarvis_user', {
+      first_name: first_name,
+      last_name: last_name,
+      email_address: email,
+      schools: [parseInt(schools)], // passes [1] where 1 is the school id
+      password: default_password,
+    }).then(
+      (response) => {
+        console.log(response);
+        window.location.href = "/jarvis/super-admins";
+      }),
+      (error) => {
+        // Failure
+      }
+  });
+}
 
 function onAddUserPageLoad() {
   // write my some javascript code that detects a click on #create-user, gets the values from #first-name, #last-name, #employee-id, #email, #role dropdown, and #send-email checkbox and post the values using the xano sdk
@@ -143,5 +201,6 @@ window.avant = {
   cloneAndFill: cloneAndFill,
   onAddChildPageLoad: onAddChildPageLoad,
   onAddUserPageLoad: onAddUserPageLoad,
-  onAdminUserListPageLoad: onAdminUserListPageLoad
+  onAdminUserListPageLoad: onAdminUserListPageLoad,
+  onAddSuperAdminPageLoad: onAddSuperAdminPageLoad
 };
