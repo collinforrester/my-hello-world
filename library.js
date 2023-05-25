@@ -197,7 +197,6 @@ function onAdminUserListPageLoad() {
 window.avant = {
   logout: logout,
   checkIfUserIsLoggedIn: checkIfUserIsLoggedIn,
-  fillHtml: fillHtml,
   cloneAndFill: cloneAndFill,
   onAddChildPageLoad: onAddChildPageLoad,
   onAddUserPageLoad: onAddUserPageLoad,
